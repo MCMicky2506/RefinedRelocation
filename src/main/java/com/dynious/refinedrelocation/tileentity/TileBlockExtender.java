@@ -8,6 +8,7 @@ import com.dynious.refinedrelocation.lib.Mods;
 import com.dynious.refinedrelocation.mods.IC2Helper;
 import com.dynious.refinedrelocation.tileentity.energy.TileUniversalElectricity;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Optional;
 import ic2.api.energy.tile.IEnergySink;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -157,8 +158,15 @@ public class TileBlockExtender extends TileUniversalElectricity implements ISide
         }
     }
 
+    @Optional.Method(modid = Mods.IC2_ID)
+    @Override
+    public int getSinkTier()
+    {
+        return 0;
+    }
+
     /*
-    
+
     @Method(modid = Mods.COFH_CORE_ID)
     public void setEnergyHandler(IEnergyHandler energyHandler)
     {
@@ -749,33 +757,22 @@ public class TileBlockExtender extends TileUniversalElectricity implements ISide
 
     @Method(modid = Mods.IC2_ID)
     @Override
-    public double demandedEnergyUnits()
+    public double getDemandedEnergy()
     {
         if (getEnergySink() != null)
         {
-            return getEnergySink().demandedEnergyUnits();
+            return getEnergySink().getDemandedEnergy();
         }
         return 0;
     }
 
     @Method(modid = Mods.IC2_ID)
     @Override
-    public double injectEnergyUnits(ForgeDirection forgeDirection, double v)
+    public double injectEnergy(ForgeDirection forgeDirection, double v, double v2)
     {
         if (getEnergySink() != null)
         {
-            return getEnergySink().injectEnergyUnits(getInputSide(forgeDirection), v);
-        }
-        return 0;
-    }
-
-    @Method(modid = Mods.IC2_ID)
-    @Override
-    public int getMaxSafeInput()
-    {
-        if (getEnergySink() != null)
-        {
-            return getEnergySink().getMaxSafeInput();
+            return getEnergySink().injectEnergy(getInputSide(forgeDirection), v, v2);
         }
         return 0;
     }

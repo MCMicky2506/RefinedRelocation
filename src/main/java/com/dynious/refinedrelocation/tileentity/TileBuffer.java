@@ -12,6 +12,7 @@ import com.dynious.refinedrelocation.mods.IC2Helper;
 import com.dynious.refinedrelocation.tileentity.energy.TileUniversalElectricity;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
+import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergySink;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -348,49 +349,49 @@ public class TileBuffer extends TileUniversalElectricity implements ISidedInvent
         return new FluidTankInfo[]{new FluidTankInfo(null, Integer.MAX_VALUE)};
     }
 
-    @Optional.Method(modid = "IC2")
-    @Override
-    public double demandedEnergyUnits()
-    {
-        return Double.MAX_VALUE;
-    }
+//    @Optional.Method(modid = "IC2")
+//    @Override
+//    public double demandedEnergyUnits()
+//    {
+//        return Double.MAX_VALUE;
+//    }
+//
+//    @Optional.Method(modid = Mods.IC2_ID)
+//    @Override
+//    public double injectEnergyUnits(ForgeDirection directionFrom, double amount)
+//    {
+//        double inputAmount = amount;
+//        for (ForgeDirection outputSide : getOutputSidesForInsertDirection(directionFrom))
+//        {
+//            amount = insertEnergyUnits(amount, outputSide.ordinal());
+//            if (amount == 0)
+//            {
+//                return inputAmount;
+//            }
+//        }
+//        return inputAmount - amount;
+//    }
 
     @Optional.Method(modid = Mods.IC2_ID)
-    @Override
-    public double injectEnergyUnits(ForgeDirection directionFrom, double amount)
-    {
-        double inputAmount = amount;
-        for (ForgeDirection outputSide : getOutputSidesForInsertDirection(directionFrom))
-        {
-            amount = insertEnergyUnits(amount, outputSide.ordinal());
-            if (amount == 0)
-            {
-                return inputAmount;
-            }
-        }
-        return inputAmount - amount;
-    }
-
-    @Optional.Method(modid = Mods.IC2_ID)
-    public double insertEnergyUnits(double amount, int side)
+    public double insertEnergyUnits(double amount, int side, double voltage)
     {
         TileEntity tile = tiles[side];
         if (tile != null)
         {
             if (tile instanceof IEnergySink)
             {
-                amount -= ((IEnergySink)tile).injectEnergyUnits(ForgeDirection.getOrientation(side).getOpposite(), Math.min(amount, ((IEnergySink)tile).getMaxSafeInput()));
+                amount -= ((IEnergySink)tile).injectEnergy(ForgeDirection.getOrientation(side).getOpposite(), Math.min(amount, ((IEnergySink)tile).getDemandedEnergy()), voltage);
             }
         }
         return amount;
     }
 
-    @Optional.Method(modid = Mods.IC2_ID)
-    @Override
-    public int getMaxSafeInput()
-    {
-        return Integer.MAX_VALUE;
-    }
+//    @Optional.Method(modid = Mods.IC2_ID)
+//    @Override
+//    public int getMaxSafeInput()
+//    {
+//        return Integer.MAX_VALUE;
+//    }
 
     @Override
     public void invalidate()
@@ -417,6 +418,33 @@ public class TileBuffer extends TileUniversalElectricity implements ISidedInvent
     public boolean acceptsEnergyFrom(TileEntity emitter, ForgeDirection direction)
     {
         return true;
+    }
+
+    @Optional.Method(modid = Mods.IC2_ID)
+    @Override
+    public double getDemandedEnergy()
+    {
+        return Double.MAX_VALUE;
+    }
+
+    @Optional.Method(modid = Mods.IC2_ID)
+    @Override
+    public int getSinkTier()
+    {
+        return 4; // Maximum IC2 energy tier
+    }
+
+    @Optional.Method(modid = Mods.IC2_ID)
+    @Override
+    public double injectEnergy(ForgeDirection forgeDirection, double v, double v2)
+    {
+        double inputAmount = v;
+        for (ForgeDirection outputSide : getOutputSidesForInsertDirection(forgeDirection))
+        {
+            v = insertEnergyUnits(v, outputSide.ordinal(), v2);
+        }
+        System.out.println(inputAmount - v);
+        return inputAmount - v;
     }
 
     @Optional.Method(modid = Mods.BC_API_POWER_ID)

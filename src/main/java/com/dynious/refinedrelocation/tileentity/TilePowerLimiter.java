@@ -9,6 +9,7 @@ import com.dynious.refinedrelocation.lib.Mods;
 import com.dynious.refinedrelocation.mods.IC2Helper;
 import com.dynious.refinedrelocation.tileentity.energy.TileUniversalElectricity;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Optional;
 import ic2.api.energy.tile.IEnergySink;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -354,11 +355,11 @@ public class TilePowerLimiter extends TileUniversalElectricity implements ILoopa
 
     @Method(modid = Mods.IC2_ID)
     @Override
-    public double demandedEnergyUnits()
+    public double getDemandedEnergy()
     {
         if (getEnergySink() != null && !getDisablePower())
         {
-            double demanded =  getEnergySink().demandedEnergyUnits();
+            double demanded =  getEnergySink().getDemandedEnergy();
             if (demanded > EnergyType.EU.fromInternal(maxAcceptedEnergy))
             {
                 demanded = EnergyType.EU.fromInternal(maxAcceptedEnergy);
@@ -368,9 +369,16 @@ public class TilePowerLimiter extends TileUniversalElectricity implements ILoopa
         return 0;
     }
 
+    @Optional.Method(modid = Mods.IC2_ID)
+    @Override
+    public int getSinkTier()
+    {
+        return 4;
+    }
+
     @Method(modid = Mods.IC2_ID)
     @Override
-    public double injectEnergyUnits(ForgeDirection forgeDirection, double v)
+    public double injectEnergy(ForgeDirection forgeDirection, double v, double v2)
     {
         if (getEnergySink() != null && !getDisablePower())
         {
@@ -380,21 +388,21 @@ public class TilePowerLimiter extends TileUniversalElectricity implements ILoopa
                 storedEnergy = v - EnergyType.EU.fromInternal(maxAcceptedEnergy);
                 v = EnergyType.EU.fromInternal(maxAcceptedEnergy);
             }
-            return getEnergySink().injectEnergyUnits(forgeDirection.getOpposite(), v) + storedEnergy;
+            return getEnergySink().injectEnergy(forgeDirection.getOpposite(), v, v2) + storedEnergy;
         }
         return v;
     }
 
-    @Method(modid = Mods.IC2_ID)
-    @Override
-    public int getMaxSafeInput()
-    {
-        if (getEnergySink() != null)
-        {
-            return getEnergySink().getMaxSafeInput();
-        }
-        return 0;
-    }
+//    @Method(modid = Mods.IC2_ID)
+//    @Override
+//    public int getMaxSafeInput()
+//    {
+//        if (getEnergySink() != null)
+//        {
+//            return getEnergySink().getMaxSafeInput();
+//        }
+//        return 0;
+//    }
 
     @Method(modid = Mods.IC2_ID)
     @Override
